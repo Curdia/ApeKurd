@@ -1,3 +1,4 @@
+
 import tweepy
 import os
 from langdetect import detect
@@ -47,8 +48,14 @@ def get_top_mention():
 def share_top_tweet(tweet):
     tweet_url = f"https://twitter.com/{tweet['user']}/status/{tweet['id']}"
     status = f"@{tweet['user']} wrote 👇\n\n{tweet_url}"
-    api.update_status(status=status)
-    print("✅ Shared:", status)
+    try:
+        api.update_status(status=status)
+        print("✅ Shared:", status)
+    except tweepy.errors.Forbidden as e:
+        print("Failed to share tweet:", e)
+        print("Ensure your API keys have the necessary permissions.")
+    except Exception as e:
+        print("An error occurred:", e)
 
 if __name__ == "__main__":
     top_tweet = get_top_mention()
@@ -56,4 +63,3 @@ if __name__ == "__main__":
         share_top_tweet(top_tweet)
     else:
         print("No valid tweet to share.")
-
