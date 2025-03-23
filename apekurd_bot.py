@@ -2,7 +2,7 @@ import tweepy
 import os
 from langdetect import detect
 
-# --- Load secrets from environment variables (GitHub Actions) ---
+# Get secrets from environment variables
 API_KEY = os.getenv("API_KEY")
 API_SECRET = os.getenv("API_SECRET")
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
@@ -10,11 +10,11 @@ ACCESS_SECRET = os.getenv("ACCESS_SECRET")
 
 BOT_USERNAME = "@ApeKurd"
 
-# --- Tweepy Auth ---
+# Set up Tweepy
 auth = tweepy.OAuth1UserHandler(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_SECRET)
 api = tweepy.API(auth)
 
-# --- Content Filters ---
+# Blacklist keywords
 BLACKLIST = ["hate", "racist", "nsfw", "spam", "violence"]
 
 def is_valid_tweet(text):
@@ -50,10 +50,10 @@ def share_top_tweet(tweet):
     api.update_status(status=status)
     print("✅ Shared:", status)
 
-# --- Run Bot ---
 if __name__ == "__main__":
     top_tweet = get_top_mention()
     if top_tweet:
         share_top_tweet(top_tweet)
     else:
         print("No valid tweet to share.")
+
