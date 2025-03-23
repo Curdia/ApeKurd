@@ -12,7 +12,7 @@ API_KEY = os.getenv("be9oCEz16rBI9p7UCb4zPUAse")
 API_SECRET = os.getenv("YGoRaH7nxzXSWVwZoqohi7xjNPOqMOXdvLDTpIVy0nTxymRaUR")
 ACCESS_TOKEN = os.getenv("1903848150709805056-o9DakpwrUB5R1BvvJOgUHBIlM1yqI0")
 ACCESS_SECRET = os.getenv("YBSjJbCXAoipsL4ZaFvC6RzwIQAp0EjwgnFdgLiIdqB6X")
-BOT_USERNAME = "@APEKURD"
+BOT_USERNAME = "@ApeKurd"
 
 # --- Blacklist / Filters ---
 BLACKLIST_WORDS = ["hate", "racist", "spam", "nsfw", "violence"]
