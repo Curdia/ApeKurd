@@ -1,75 +1,67 @@
-import os
-import requests
-from bs4 import BeautifulSoup
 import tweepy
+import os
+import time
+from langdetect import detect
+from dotenv import load_dotenv
 
-TWEETED_FILE = "tweeted.txt"
-KEYWORDS = ["son dakika", "breaking", "acil"]
+# Load environment variables from .env file
+load_dotenv()
 
-API_KEY = os.getenv("TWITTER_API_KEY")
-API_SECRET = os.getenv("TWITTER_API_SECRET")
-ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
-ACCESS_SECRET = os.getenv("TWITTER_ACCESS_SECRET")
+# --- Configuration ---
+API_KEY = os.getenv("be9oCEz16rBI9p7UCb4zPUAse")
+API_SECRET = os.getenv("YGoRaH7nxzXSWVwZoqohi7xjNPOqMOXdvLDTpIVy0nTxymRaUR")
+ACCESS_TOKEN = os.getenv("1903848150709805056-o9DakpwrUB5R1BvvJOgUHBIlM1yqI0")
+ACCESS_SECRET = os.getenv("YBSjJbCXAoipsL4ZaFvC6RzwIQAp0EjwgnFdgLiIdqB6X")
+BOT_USERNAME = "@APEKURD"
 
-def is_recent(text):
-    return any(kw in text.lower() for kw in KEYWORDS)
+# --- Blacklist / Filters ---
+BLACKLIST_WORDS = ["hate", "racist", "spam", "nsfw", "violence"]
 
-def load_tweeted():
-    if not os.path.exists(TWEETED_FILE):
-        return set()
-    with open(TWEETED_FILE, "r", encoding="utf-8") as f:
-        return set(line.strip() for line in f.readlines())
+def is_valid_tweet(text):
+    try:
+        language = detect(text)
+        if language not in ["en", "ku"]:  # English or Kurdish only
+            return False
+        if len(text.strip()) < 15:
+            return False
+        if any(bad_word in text.lower() for bad_word in BLACKLIST_WORDS):
+            return False
+        return True
+    except:
+        return False
 
-def save_tweeted(tweeted_set):
-    with open(TWEETED_FILE, "w", encoding="utf-8") as f:
-        for link in tweeted_set:
-            f.write(link + "\n")
-
-def scrape_site(url):
-    res = requests.get(url)
-    soup = BeautifulSoup(res.text, "html.parser")
-    headlines = []
-    for a in soup.find_all("a", href=True):
-        title = a.get_text(strip=True)
-        link = a["href"]
-        if is_recent(title) and link.startswith("http"):
-            headlines.append({"title": title, "link": link})
-    return headlines
-
-def get_all_news():
-    sites = [
-        "https://www.rudaw.net/",
-        "https://channel8.com/",
-        "https://www.ozgurpolitika.com/"
-    ]
-    all_news = []
-    for site in sites:
-        try:
-            all_news += scrape_site(site)
-        except Exception as e:
-            print(f"{site} okunamadı: {e}")
-    return all_news
-
-def post_to_twitter(news_list, tweeted_links):
+# --- Twitter Auth ---
+def create_api():
     auth = tweepy.OAuth1UserHandler(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_SECRET)
-    api = tweepy.API(auth)
+    return tweepy.API(auth)
 
-    for news in news_list:
-        if news["link"] not in tweeted_links:
-            tweet = f"Son Dakika: {news['title']}\n{news['link']}"
-            try:
-                api.update_status(tweet)
-                print(f"Tweet atıldı: {tweet}")
-                tweeted_links.add(news["link"])
-                save_tweeted(tweeted_links)
-            except Exception as e:
-                print(f"Tweet atılamadı: {e}")
+# --- Get Mentions ---
+def fetch_valid_mentions(api, count=20):
+    mentions = api.mentions_timeline(count=count, tweet_mode="extended")
+    valid = []
+    for tweet in mentions:
+        if is_valid_tweet(tweet.full_text):
+            valid.append({
+                "id": tweet.id,
+                "user": tweet.user.screen_name,
+                "likes": tweet.favorite_count,
+                "text": tweet.full_text
+            })
+    return sorted(valid, key=lambda x: x["likes"], reverse=True)
 
-def main():
-    print("Bot başlıyor...")
-    tweeted = load_tweeted()
-    news = get_all_news()
-    post_to_twitter(news, tweeted)
+# --- Quote Top Tweet ---
+def quote_top_tweet(api, tweets):
+    if not tweets:
+        print("No valid tweets found.")
+        return
+    top = tweets[0]
+    tweet_url = f"https://twitter.com/{top['user']}/status/{top['id']}"
+    status = f"@{top['user']} wrote 👇\n\n{tweet_url}"
+    api.update_status(status=status)
+    print("Tweet shared successfully:", status)
 
+# --- Main Execution ---
 if __name__ == "__main__":
-    main()
+    api = create_api()
+    mentions = fetch_valid_mentions(api)
+    quote_top_tweet(api, mentions)
