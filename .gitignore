@@ -1,2 +1,18 @@
-.env
+# Python derleme dosyaları
 __pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Ortam dosyaları
+.env
+*.env
+
+# IDE klasörleri
+.vscode/
+.idea/
+
+# Çıktı veya log dosyaları
+*.log
+*.txt
