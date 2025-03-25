@@ -47,17 +47,24 @@ def is_valid_post(text):
 # Share top valid post (first one found)
 def share_top_post():
     mentions = get_mentions()
-    valid = [m for m in mentions if is_valid_post(m['text'])]
+    print(f"Mentions found: {len(mentions)}")
+    print("Raw mention texts:")
+    for m in mentions:
+        print(m["text"])
+    
+    valid = [m for m in mentions if is_valid_post(m["text"])]
     if not valid:
         print("No valid mentions found.")
         return
+
     best = valid[0]
     message = f"@{best['author']} wrote 👇\n\n{best['text']}"
     try:
         client.send_post(text=message)
         print("✅ Shared:", message)
     except Exception as e:
-        print("Error sharing post:", e)
+        print("❌ Error sharing post:", e)
+
 
 if __name__ == "__main__":
     share_top_post()
