@@ -1,21 +1,18 @@
 from atproto import Client
 from langdetect import detect
 
-# Bluesky credentials
+# 🔐 Bluesky credentials
 HANDLE = "apekurd.bsky.social"
 APP_PASSWORD = "qrzy-t7oz-m24a-psni"
 
-# Blacklist keywords
+# ❌ Kara liste kelimeler
 BLACKLIST = ["hate", "racist", "nsfw", "spam", "violence"]
 
-# Initialize client
+# 🔌 Bluesky API bağlantısı
 client = Client()
 client.login(HANDLE, APP_PASSWORD)
 
-# Get bot's DID
-BOT_DID = client.me.did
-
-# Fetch posts that mention the bot
+# 🔎 Mention içeren postları al
 def get_mentions():
     feed = client.app.bsky.feed.get_author_feed({'actor': HANDLE})
     mentions = []
@@ -30,7 +27,7 @@ def get_mentions():
             })
     return mentions
 
-# Filter for valid posts
+# ✅ İçerik filtresi
 def is_valid_post(text):
     try:
         lang = detect(text)
@@ -44,17 +41,17 @@ def is_valid_post(text):
     except:
         return False
 
-# Share top valid post (first one found)
+# 📣 Geçerli postu paylaş
 def share_top_post():
     mentions = get_mentions()
     print(f"Mentions found: {len(mentions)}")
     print("Raw mention texts:")
     for m in mentions:
-        print(m["text"])
+        print("—", m["text"])
     
     valid = [m for m in mentions if is_valid_post(m["text"])]
     if not valid:
-        print("No valid mentions found.")
+        print("⚠️ No valid mentions found.")
         return
 
     best = valid[0]
@@ -65,11 +62,8 @@ def share_top_post():
     except Exception as e:
         print("❌ Error sharing post:", e)
 
-
+# ▶️ Çalıştır
 if __name__ == "__main__":
     share_top_post()
-    print(f"Mentions found: {len(mentions)}")
-print("Raw mention texts:")
-for m in mentions:
-    print(m["text"])
+
 
