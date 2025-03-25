@@ -1,2 +1,26 @@
-- name: Run Bluesky Bot
-  run: python apekurd_bluesky_bot.py
+name: Run APEKURD Bluesky Bot
+
+on:
+  workflow_dispatch:      # Manuel tetiklemek için
+  schedule:
+    - cron: "0 */2 * * *"  # Her 2 saatte bir çalışır
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        pip install atproto langdetect
+
+    - name: Run the bot
+      run: python apekurd_bluesky_bot.py
