@@ -12,19 +12,22 @@ BLACKLIST = ["hate", "racist", "nsfw", "spam", "violence"]
 client = Client()
 client.login(HANDLE, APP_PASSWORD)
 
-# 🔎 Mention içeren postları al
+# 🔎 Mention içeren postları timeline üzerinden çek
 def get_mentions():
-    feed = client.app.bsky.feed.get_author_feed({'actor': HANDLE})
+    feed = client.app.bsky.feed.get_timeline()
     mentions = []
     for item in feed.feed:
-        text = item.post.record.text
-        if f"@{HANDLE}" in text:
-            mentions.append({
-                "uri": item.post.uri,
-                "cid": item.post.cid,
-                "text": text,
-                "author": item.post.author.handle
-            })
+        try:
+            text = item.post.record.text
+            if f"@{HANDLE}" in text:
+                mentions.append({
+                    "uri": item.post.uri,
+                    "cid": item.post.cid,
+                    "text": text,
+                    "author": item.post.author.handle
+                })
+        except AttributeError:
+            continue  # bazı postlar (repost, image-only) text içermeyebilir
     return mentions
 
 # ✅ İçerik filtresi
@@ -65,5 +68,3 @@ def share_top_post():
 # ▶️ Çalıştır
 if __name__ == "__main__":
     share_top_post()
-
-
