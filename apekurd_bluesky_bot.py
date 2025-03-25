@@ -61,3 +61,8 @@ def share_top_post():
 
 if __name__ == "__main__":
     share_top_post()
+    print(f"Mentions found: {len(mentions)}")
+print("Raw mention texts:")
+for m in mentions:
+    print(m["text"])
+
