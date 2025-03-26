@@ -1,9 +1,9 @@
-name: Run APEKURD Bluesky Bot
+name: Run Hashtag Bot
 
 on:
-  workflow_dispatch:      # Manuel tetiklemek için
   schedule:
-    - cron: "0 */2 * * *"  # Her 2 saatte bir çalışır
+    - cron: "0 * * * *"   # 🔁 Her 1 saatte bir tetiklenir
+  workflow_dispatch:       # 🧪 Manuel çalıştırma
 
 jobs:
   run-bot:
@@ -23,4 +23,4 @@ jobs:
         pip install atproto langdetect
 
     - name: Run the bot
-      run: python apekurd_bluesky_bot.py
+      run: python hashtag_bot.py
