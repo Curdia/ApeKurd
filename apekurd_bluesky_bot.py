@@ -1,39 +1,49 @@
-from atproto import Client
+import os
+import zipfile
+
+# Yeniden oluşturma işlemi
+project_name = "apekurd-bluesky-hashtag-bot"
+file_name = "hashtag_bot.py"
+os.makedirs(project_name, exist_ok=True)
+
+hashtag_bot_code = '''from atproto import Client
 from langdetect import detect
 
-# 🔐 Bluesky credentials
+# Bluesky credentials
 HANDLE = "apekurd.bsky.social"
 APP_PASSWORD = "qrzy-t7oz-m24a-psni"
+TARGET_HASHTAG = "#freekurdistan"
 
-# ❌ Kara liste kelimeler
+# Kara liste
 BLACKLIST = ["hate", "racist", "nsfw", "spam", "violence"]
 
-# 🔌 Bluesky API bağlantısı
+# Initialize client
 client = Client()
 client.login(HANDLE, APP_PASSWORD)
 
-# 🔎 Mention içeren postları timeline üzerinden çek
-def get_mentions():
+# Timeline'dan hashtag içeren gönderileri çek
+def get_tagged_posts():
     feed = client.app.bsky.feed.get_timeline()
-    mentions = []
+    tagged = []
     for item in feed.feed:
         try:
             text = item.post.record.text
-            if f"@{HANDLE}" in text:
-                mentions.append({
+            if TARGET_HASHTAG.lower() in text.lower():
+                tagged.append({
                     "uri": item.post.uri,
                     "cid": item.post.cid,
                     "text": text,
                     "author": item.post.author.handle
                 })
-        except AttributeError:
-            continue  # bazı postlar (repost, image-only) text içermeyebilir
-    return mentions
+        except Exception:
+            continue
+    return tagged
 
-# ✅ İçerik filtresi
+# İçerik filtresi
 def is_valid_post(text):
     try:
         lang = detect(text)
+        print(f"Detected language: {lang}")
         if lang not in ["en", "ku"]:
             return False
         if len(text.strip()) < 15:
@@ -44,27 +54,38 @@ def is_valid_post(text):
     except:
         return False
 
-# 📣 Geçerli postu paylaş
+# Paylaşım yap
 def share_top_post():
-    mentions = get_mentions()
-    print(f"Mentions found: {len(mentions)}")
-    print("Raw mention texts:")
-    for m in mentions:
-        print("—", m["text"])
-    
-    valid = [m for m in mentions if is_valid_post(m["text"])]
+    posts = get_tagged_posts()
+    print(f"Tagged posts found: {len(posts)}")
+    print("Raw tagged texts:")
+    for p in posts:
+        print("—", p["text"])
+
+    valid = [p for p in posts if is_valid_post(p["text"])]
     if not valid:
-        print("⚠️ No valid mentions found.")
+        print("⚠️ No valid tagged posts found.")
         return
 
     best = valid[0]
-    message = f"@{best['author']} wrote 👇\n\n{best['text']}"
+    message = f"@{best['author']} used {TARGET_HASHTAG} 👇\\n\\n{best['text']}"
     try:
         client.send_post(text=message)
         print("✅ Shared:", message)
     except Exception as e:
         print("❌ Error sharing post:", e)
 
-# ▶️ Çalıştır
 if __name__ == "__main__":
     share_top_post()
+'''
+
+file_path = os.path.join(project_name, file_name)
+with open(file_path, "w") as f:
+    f.write(hashtag_bot_code)
+
+# Zip oluştur
+zip_path = f"/mnt/data/{project_name}.zip"
+with zipfile.ZipFile(zip_path, "w") as zipf:
+    zipf.write(file_path, arcname=file_name)
+
+zip_path
