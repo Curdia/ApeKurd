@@ -2,16 +2,14 @@ import os
 from atproto import Client
 from langdetect import detect
 
-# GitHub Secrets üzerinden çevre değişkenlerini al
+# Load credentials from GitHub Actions secrets
 HANDLE = os.getenv("HANDLE")
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 TARGET_HASHTAG = "#freekurdistan"
 
-
-# Bluesky credentials
-HANDLE = os.getenv("HANDLE")
-APP_PASSWORD = os.getenv("APP_PASSWORD")
-TARGET_HASHTAG = "#freekurdistan"
+# Check if secrets are properly loaded
+if not HANDLE or not APP_PASSWORD:
+    raise ValueError("❌ HANDLE or APP_PASSWORD not found. Check your GitHub Secrets.")
 
 # Blacklist keywords
 BLACKLIST = ["hate", "racist", "nsfw", "spam", "violence"]
@@ -75,8 +73,9 @@ def share_top_post():
         print("⚠️ No valid tagged posts found.")
         return
 
+    # Sort by popularity: currently just picks the first one (improve if needed)
     best = valid[0]
-    message = f"@{best['author']} used {TARGET_HASHTAG} 👇\n\n{best['text']}"
+    message = f"@{best['author']} used {TARGET_HASHTAG} 👇\\n\\n{best['text']}"
     try:
         client.send_post(text=message)
         print("✅ Successfully shared the post.")
@@ -85,3 +84,4 @@ def share_top_post():
 
 if __name__ == "__main__":
     share_top_post()
+
