@@ -2,8 +2,8 @@ from atproto import Client
 from langdetect import detect
 
 # Bluesky credentials
-HANDLE = "apekurd.bsky.social"
-APP_PASSWORD = "qrzy-t7oz-m24a-psni"
+HANDLE = os.getenv("HANDLE")
+APP_PASSWORD = os.getenv("APP_PASSWORD")
 TARGET_HASHTAG = "#freekurdistan"
 
 # Blacklist keywords
