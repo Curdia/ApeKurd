@@ -1,3 +1,6 @@
+print("DEBUG - HANDLE:", HANDLE)
+print("DEBUG - APP_PASSWORD:", "✅ Loaded" if APP_PASSWORD else "❌ Missing")
+
 import os
 from atproto import Client
 from langdetect import detect
