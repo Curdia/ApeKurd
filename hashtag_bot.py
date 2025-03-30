@@ -1,5 +1,12 @@
+import os
 from atproto import Client
 from langdetect import detect
+
+# GitHub Secrets üzerinden çevre değişkenlerini al
+HANDLE = os.getenv("HANDLE")
+APP_PASSWORD = os.getenv("APP_PASSWORD")
+TARGET_HASHTAG = "#freekurdistan"
+
 
 # Bluesky credentials
 HANDLE = os.getenv("HANDLE")
