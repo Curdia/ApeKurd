@@ -77,4 +77,8 @@ print("DEBUG - HANDLE:", HANDLE)
 print("DEBUG - APP_PASSWORD:", "✅ Loaded" if APP_PASSWORD else "❌ Missing")
 print("HANDLE:", HANDLE or "❌ NOT SET")
 print("APP_PASSWORD:", "✅" if APP_PASSWORD else "❌ NOT SET")
+print("ENV DEBUG")
+for key in ["HANDLE", "APP_PASSWORD"]:
+    print(f"{key} →", os.getenv(key) or "❌ NOT SET")
+
 
