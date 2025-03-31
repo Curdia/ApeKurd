@@ -23,4 +23,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run the Bluesky bot
+      env:
+        HANDLE: ${{ secrets.HANDLE }}
+        APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
       run: python hashtag_bot.py
