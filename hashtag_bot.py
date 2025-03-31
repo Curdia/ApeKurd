@@ -1,6 +1,3 @@
-print("DEBUG - HANDLE:", HANDLE)
-print("DEBUG - APP_PASSWORD:", "✅ Loaded" if APP_PASSWORD else "❌ Missing")
-
 import os
 from atproto import Client
 from langdetect import detect
@@ -76,3 +73,5 @@ def share_top_post():
 
 if __name__ == "__main__":
     share_top_post()
+print("DEBUG - HANDLE:", HANDLE)
+print("DEBUG - APP_PASSWORD:", "✅ Loaded" if APP_PASSWORD else "❌ Missing")
