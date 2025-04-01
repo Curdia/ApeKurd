@@ -31,13 +31,13 @@ def get_tagged_posts():
         for tag in TARGET_HASHTAGS:
             results = client.app.bsky.feed.search_posts({'q': tag})
             for item in results.posts:
-                text = item.post.record.text
+                text = item.record.text
                 if tag.lower() in text.lower():
                     tagged.append({
-                        "uri": item.post.uri,
-                        "cid": item.post.cid,
+                        "uri": item.uri,
+                        "cid": item.cid,
                         "text": text,
-                        "author": item.post.author.handle
+                        "author": item.author.handle
                     })
     except Exception as e:
         print(f"Error while searching posts: {e}")
