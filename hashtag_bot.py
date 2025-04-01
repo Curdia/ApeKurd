@@ -49,7 +49,7 @@ def is_valid_post(text):
     try:
         lang = detect(text)
         print(f"Detected language: {lang}")
-        if lang not in ["en", "ku"]:
+        if lang not in ["en", "ku" "ckb", "kmr"]:
             return False
         if len(text.strip()) < 15:
             return False
