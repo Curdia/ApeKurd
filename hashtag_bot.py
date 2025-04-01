@@ -26,22 +26,23 @@ client.login(HANDLE, APP_PASSWORD)
 
 # 🔍 Fetch posts with target hashtags
 def get_tagged_posts():
-    feed = client.app.bsky.feed.get_timeline()
     tagged = []
-    for item in feed.feed:
-        try:
-            text = item.post.record.text
-            if any(tag.lower() in text.lower() for tag in TARGET_HASHTAGS):
-                tagged.append({
-                    "uri": item.post.uri,
-                    "cid": item.post.cid,
-                    "text": text,
-                    "author": item.post.author.handle
-                })
-        except Exception as e:
-            print(f"Skipping item due to error: {e}")
-            continue
+    try:
+        for tag in TARGET_HASHTAGS:
+            results = client.app.bsky.feed.search_posts({'q': tag})
+            for item in results.get('hits', []):
+                text = item['record']['text']
+                if tag.lower() in text.lower():
+                    tagged.append({
+                        "uri": item['uri'],
+                        "cid": item['cid'],
+                        "text": text,
+                        "author": item['author']['handle']
+                    })
+    except Exception as e:
+        print(f"Error while searching posts: {e}")
     return tagged
+
 
 # ✅ Check if the post is valid
 def is_valid_post(text):
