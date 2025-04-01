@@ -30,7 +30,7 @@ def get_tagged_posts():
     try:
         for tag in TARGET_HASHTAGS:
             results = client.app.bsky.feed.search_posts({'q': tag})
-            for item in results.hits:
+            for item in results.posts:
                 text = item.post.record.text
                 if tag.lower() in text.lower():
                     tagged.append({
