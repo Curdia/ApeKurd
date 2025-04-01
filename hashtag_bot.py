@@ -79,7 +79,17 @@ def share_top_post():
 
     best = valid[0]
     used_tag = next((tag for tag in TARGET_HASHTAGS if tag.lower() in best['text'].lower()), TARGET_HASHTAGS[0])
-    message = f"@{best['author']} used {used_tag} 👇\n\n{best['text']}"
+    prefix = f"@{best['author']} used {used_tag} 👇\n\n"
+max_length = 300
+max_text_length = max_length - len(prefix)
+
+# Uzunsa kes
+text_body = best['text']
+if len(prefix + text_body) > max_length:
+    text_body = text_body[:max_text_length - 3] + "..."
+
+message = prefix + text_body
+
 
     try:
         client.send_post(text=message)
