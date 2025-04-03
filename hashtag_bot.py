@@ -43,13 +43,12 @@ def get_tagged_posts():
         print(f"Error while searching posts: {e}")
     return tagged
 
-
 # ✅ Check if the post is valid
 def is_valid_post(text):
     try:
         lang = detect(text)
         print(f"Detected language: {lang}")
-        if lang not in ["en", "ku" "ckb", "kmr" "tr"]:
+        if lang not in ["en", "ku", "ckb", "kmr", "tr"]:
             return False
         if len(text.strip()) < 15:
             return False
@@ -80,16 +79,15 @@ def share_top_post():
     best = valid[0]
     used_tag = next((tag for tag in TARGET_HASHTAGS if tag.lower() in best['text'].lower()), TARGET_HASHTAGS[0])
     prefix = f"@{best['author']} used {used_tag} 👇\n\n"
-max_length = 300
-max_text_length = max_length - len(prefix)
+    max_length = 300
+    max_text_length = max_length - len(prefix)
 
-# Uzunsa kes
-text_body = best['text']
-if len(prefix + text_body) > max_length:
-    text_body = text_body[:max_text_length - 3] + "..."
+    # Truncate if too long
+    text_body = best['text']
+    if len(prefix + text_body) > max_length:
+        text_body = text_body[:max_text_length - 3] + "..."
 
-message = prefix + text_body
-
+    message = prefix + text_body
 
     try:
         client.send_post(text=message)
@@ -100,6 +98,3 @@ message = prefix + text_body
 # ▶️ Run
 if __name__ == "__main__":
     share_top_post()
-
-
-
