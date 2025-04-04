@@ -2,41 +2,43 @@ import os
 from atproto import Client
 from langdetect import detect
 
-# Load secrets from GitHub environment
+# 🔐 Load secrets from environment
 HANDLE = os.getenv("HANDLE")
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 
-# Debugging outputs
+# 🛠 Debug info
 print("DEBUG - HANDLE:", HANDLE or "❌ NOT SET")
 print("DEBUG - APP_PASSWORD:", "✅ Loaded" if APP_PASSWORD else "❌ Missing")
 
 if not HANDLE or not APP_PASSWORD:
     raise ValueError("❌ Missing HANDLE or APP_PASSWORD. Check your GitHub Secrets.")
 
-# ✅ Hashtags to monitor
+# 🎯 Target hashtags to watch
 TARGET_HASHTAGS = ["#freekurdistan", "#kurd", "#kurdistan"]
 
-# ❌ Blocked words (content moderation)
+# 🚫 Content blacklist
 BLACKLIST = ["hate", "racist", "nsfw", "spam", "violence"]
 
 # 🔌 Connect to Bluesky
 client = Client()
 client.login(HANDLE, APP_PASSWORD)
 
-# 📁 Check if post was already shared (line-by-line comparison)
+# 📁 Check if URI already shared
 def has_been_shared(uri):
     if not os.path.exists("shared_posts.txt"):
         return False
-    with open("shared_posts.txt", "r") as f:
-        shared_uris = [line.strip() for line in f.readlines()]
+    with open("shared_posts.txt", "r", encoding="utf-8") as f:
+        shared_uris = {line.strip() for line in f if line.strip()}
+        print(f"🗂 Shared URIs: {shared_uris}")
         return uri.strip() in shared_uris
 
-# 📝 Save shared post URI to local file
+# 📝 Mark URI as shared
 def mark_as_shared(uri):
-    with open("shared_posts.txt", "a") as f:
+    with open("shared_posts.txt", "a", encoding="utf-8") as f:
         f.write(uri.strip() + "\n")
+    print(f"✅ Marked as shared: {uri.strip()}")
 
-# 🔍 Search posts by hashtag
+# 🔍 Search posts with hashtags
 def get_tagged_posts():
     tagged = []
     try:
@@ -52,60 +54,58 @@ def get_tagged_posts():
                         "author": item.author.handle
                     })
     except Exception as e:
-        print(f"❌ Error while searching posts: {e}")
+        print(f"❌ Error during post search: {e}")
     return tagged
 
-# ✅ Language + content filter
+# ✅ Filter based on language and content
 def is_valid_post(text):
     try:
         lang = detect(text)
-        print(f"Detected language: {lang}")
+        print(f"🌐 Detected language: {lang}")
         if lang not in ["en", "ku", "ckb", "kmr", "tr"]:
             return False
         if len(text.strip()) < 15:
             return False
-        if any(word in text.lower() for word in BLACKLIST):
+        if any(bad_word in text.lower() for bad_word in BLACKLIST):
             return False
         return True
     except Exception as e:
         print(f"❌ Language detection error: {e}")
         return False
 
-# 📣 Share a post (if not previously shared)
+# 📣 Share the top unshared valid post
 def share_top_post():
     posts = get_tagged_posts()
-    print(f"📥 Found {len(posts)} posts containing target hashtags.")
+    print(f"🔍 Found {len(posts)} posts with target hashtags.")
     if not posts:
-        print("ℹ️ No posts with target hashtags.")
+        print("ℹ️ No matching posts found.")
         return
 
-    print("🧾 Tagged post previews:")
+    print("📄 Previewing tagged posts:")
     for p in posts:
         print("—", p["text"])
 
-    valid = [p for p in posts if is_valid_post(p["text"])]
-    if not valid:
-        print("⚠️ No valid posts found.")
+    valid_posts = [p for p in posts if is_valid_post(p["text"])]
+    if not valid_posts:
+        print("⚠️ No valid posts to share.")
         return
 
-    # Pick the first unshared post
-    best = None
-    for post in valid:
+    # Select the first unshared post
+    for post in valid_posts:
         if not has_been_shared(post["uri"]):
             best = post
             break
-
-    if not best:
-        print("✅ All valid posts have already been shared.")
+    else:
+        print("✅ All valid posts have been shared.")
         return
 
-    # Compose post
-    used_tag = next((tag for tag in TARGET_HASHTAGS if tag.lower() in best['text'].lower()), TARGET_HASHTAGS[0])
+    # Build shareable message
+    used_tag = next((tag for tag in TARGET_HASHTAGS if tag.lower() in best["text"].lower()), TARGET_HASHTAGS[0])
     prefix = f"@{best['author']} used {used_tag} 👇\n\n"
     max_length = 300
     max_text_length = max_length - len(prefix)
 
-    text_body = best['text']
+    text_body = best["text"]
     if len(prefix + text_body) > max_length:
         text_body = text_body[:max_text_length - 3] + "..."
 
@@ -113,11 +113,12 @@ def share_top_post():
 
     try:
         client.send_post(text=message)
-        mark_as_shared(best['uri'])
-        print("✅ Post successfully shared.")
+        mark_as_shared(best["uri"])
+        print("📢 Shared successfully.")
     except Exception as e:
         print(f"❌ Failed to share post: {e}")
 
-# ▶️ Entry point
+# ▶️ Run the bot
 if __name__ == "__main__":
     share_top_post()
+
