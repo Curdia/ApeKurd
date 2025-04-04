@@ -1,18 +1,22 @@
-# Python derleme dosyaları
+# Python bytecode and build files
 __pycache__/
 *.py[cod]
 *.egg-info/
 dist/
 build/
 
-# Ortam dosyaları
+# Environment files (credentials/secrets)
 .env
 *.env
 
-# IDE klasörleri
+# IDE folders
 .vscode/
 .idea/
 
-# Çıktı veya log dosyaları
+# Output and log files
 *.log
-*.txt
+
+# IMPORTANT: We are keeping shared_posts.txt tracked
+# Do not exclude *.txt, as we need this file for bot memory
+
+# ✅ shared_posts.txt must be versioned to avoid repeated posts
