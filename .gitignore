@@ -16,7 +16,6 @@ build/
 # Output and log files
 *.log
 
-# IMPORTANT: We are keeping shared_posts.txt tracked
-# Do not exclude *.txt, as we need this file for bot memory
+# IMPORTANT: shared_posts.txt must be tracked
+# Do NOT exclude *.txt globally
 
-# ✅ shared_posts.txt must be versioned to avoid repeated posts
