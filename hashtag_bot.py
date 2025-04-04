@@ -23,12 +23,13 @@ BLACKLIST = ["hate", "racist", "nsfw", "spam", "violence"]
 client = Client()
 client.login(HANDLE, APP_PASSWORD)
 
-# 📁 Check if post was already shared
+# 📁 Check if post was already shared (line-by-line comparison)
 def has_been_shared(uri):
     if not os.path.exists("shared_posts.txt"):
         return False
     with open("shared_posts.txt", "r") as f:
-        return uri.strip() in f.read()
+        shared_uris = [line.strip() for line in f.readlines()]
+        return uri.strip() in shared_uris
 
 # 📝 Save shared post URI to local file
 def mark_as_shared(uri):
