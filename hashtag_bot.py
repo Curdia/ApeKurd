@@ -29,6 +29,8 @@ def has_been_shared(uri):
         return False
     with open("shared_posts.txt", "r", encoding="utf-8") as f:
         shared_uris = {line.strip() for line in f if line.strip()}
+        print(f"🗂 Shared URIs: {shared_uris}")
+        print(f"🔎 Checking if already shared: {uri.strip()}")
         return uri.strip() in shared_uris
 
 # 📝 Save URI to local shared list
@@ -83,11 +85,12 @@ def share_top_post():
 
     print("📄 Checking content validity...")
     valid_posts = [p for p in posts if is_valid_post(p["text"])]
-    
+
     if not valid_posts:
         print("⚠️ No valid posts to share.")
         return
 
+    # Select the first unshared post
     best = None
     for post in valid_posts:
         if not has_been_shared(post["uri"]):
@@ -121,3 +124,8 @@ def share_top_post():
 if __name__ == "__main__":
     share_top_post()
 
+    # Log shared_posts.txt content
+    if os.path.exists("shared_posts.txt"):
+        print("\n📂 Current shared_posts.txt content:")
+        with open("shared_posts.txt", "r") as f:
+            print(f.read())
