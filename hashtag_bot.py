@@ -129,3 +129,7 @@ if __name__ == "__main__":
         print("\n📂 Current shared_posts.txt content:")
         with open("shared_posts.txt", "r") as f:
             print(f.read())
+            if os.path.exists("shared_posts.txt"):
+    print("\n📁 Final shared_posts.txt content:")
+    with open("shared_posts.txt", "r") as f:
+        print(f.read())
