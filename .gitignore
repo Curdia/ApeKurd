@@ -18,4 +18,7 @@ build/
 
 # IMPORTANT: shared_posts.txt must be tracked
 # Do NOT exclude *.txt globally
-
+# Keep shared_posts.txt file
+# DO NOT ignore all .txt files
+*.log
+!shared_posts.txt
